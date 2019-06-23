@@ -1,0 +1,11 @@
+---
+- hosts: all
+  roles:
+   - role: geerlingguy.docker
+     docker_users:
+       - vagrant
+  tasks:
+    - name: Install Make for use with the build process
+      package:
+        name: make
+        state: present
