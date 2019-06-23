@@ -16,6 +16,8 @@ minecraft_banned_ips: []
 minecraft_console_fifo: /run/{{ minecraft_service_name }}/console
 minecraft_console_fifo_mode: '0666'
 minecraft_process_control: systemd
-minecraft_server_properties: {}
+minecraft_server_port: 25565
+minecraft_server_properties:
+  server-port: "{{ minecraft_server_port }}"
 
 minecraft_spigot_url: https://hub.spigotmc.org/jenkins/job/BuildTools/lastSuccessfulBuild/artifact/target/BuildTools.jar

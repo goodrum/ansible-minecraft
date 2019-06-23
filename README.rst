@@ -116,8 +116,11 @@ The following variable defaults are defined in ``defaults/main.yml``.
 ``minecraft_banned_ips``
    list of IP addresses to ban (default: ``[]``)
 
+``minecraft_server_port``
+   port onto which the service will listen (default: ``25565``)
+
 ``minecraft_server_properties``
-   dictionary of server.properties entries (e.g. ``server-port: 25565``) to set (default: ``{}``)
+   dictionary of server.properties entries (e.g. ``server-port: 25565``) to set (default: ``{server-port: "{{ minecraft_server_port }}"}``)
 
 ``minecraft_server``
   choose between ``minecraft`` or ``spigot`` (default: ``minecraft``)
