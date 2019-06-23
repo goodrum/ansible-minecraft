@@ -2,3 +2,5 @@
 
 #Vagrant Files
 .vagrant/*
+tmp/*
+*.log
