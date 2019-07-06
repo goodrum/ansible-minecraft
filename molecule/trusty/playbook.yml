@@ -1,0 +1,7 @@
+---
+- name: Converge
+  hosts: all
+  vars:
+    minecraft_process_control: supervisor
+  roles:
+    - role: devops-coop.minecraft

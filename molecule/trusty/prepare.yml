@@ -1,0 +1,9 @@
+---
+- name: Prepare
+  hosts: all
+  gather_facts: false
+  tasks:
+    # => 2019-06-30
+    # => This step should really be removed and included as part of the Role
+    - name: Update Cache
+      command: apt-get update

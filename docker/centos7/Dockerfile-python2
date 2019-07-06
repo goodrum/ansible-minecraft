@@ -1,0 +1,15 @@
+# vim: set ft=dockerfile:
+
+FROM centos:7
+
+# Colour output.
+ENV TERM=xterm
+
+RUN yum install -y epel-release \
+    && yum install -y \
+      python \
+      python-dev \
+      wget \
+      coreutils \
+      net-tools \
+    && yum clean all

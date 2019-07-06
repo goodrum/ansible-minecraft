@@ -1,0 +1,18 @@
+version: '2'
+services:
+  # => Core Base Images with Python and Python3 support
+  core_python2:
+    build:
+        context: .
+        dockerfile: Dockerfile-python2
+    privileged: true
+    entrypoint: /sbin/init
+    image: minecraft_jessie64:python2
+
+  core_python3:
+    build:
+        context: .
+        dockerfile: Dockerfile-python3
+    privileged: true
+    entrypoint: /sbin/init
+    image: minecraft_jessie64:python3
