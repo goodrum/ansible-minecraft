@@ -1,0 +1,19 @@
+# vim: set ft=dockerfile:
+
+FROM ubuntu:trusty
+
+# Colour output.
+ENV TERM=xterm
+
+RUN apt-get update -y \
+    && apt-get install -y apt-transport-https software-properties-common \
+    && apt-get --no-install-recommends install -y \
+      curl \
+      python \
+      python-dev \
+      coreutils \
+      net-tools \
+    && curl https://bootstrap.pypa.io/get-pip.py | python \
+    && apt-get autoremove \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*

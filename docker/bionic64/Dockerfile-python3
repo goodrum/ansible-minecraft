@@ -1,0 +1,34 @@
+# vim: set ft=dockerfile:
+
+FROM ubuntu:bionic
+
+# Colour output.
+ENV TERM=xterm
+
+RUN sed -i 's/# deb/deb/g' /etc/apt/sources.list \
+    && apt-get update -y \
+    && apt-get install -y systemd \
+    && apt-get install -y apt-transport-https software-properties-common \
+    && apt-get --no-install-recommends install -y \
+      curl \
+      python3 \
+      python3-dev \
+      coreutils \
+      net-tools \
+    && curl https://bootstrap.pypa.io/get-pip.py | python3 \
+    && apt-get autoremove \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN cd /lib/systemd/system/sysinit.target.wants/ \
+    && ls | grep -v systemd-tmpfiles-setup | xargs rm -f $1
+
+RUN rm -f /lib/systemd/system/multi-user.target.wants/* \
+    /etc/systemd/system/*.wants/* \
+    /lib/systemd/system/local-fs.target.wants/* \
+    /lib/systemd/system/sockets.target.wants/*udev* \
+    /lib/systemd/system/sockets.target.wants/*initctl* \
+    /lib/systemd/system/basic.target.wants/* \
+    /lib/systemd/system/anaconda.target.wants/* \
+    /lib/systemd/system/plymouth* \
+    /lib/systemd/system/systemd-update-utmp*

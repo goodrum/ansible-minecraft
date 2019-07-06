@@ -1,11 +1,71 @@
 ---
 - hosts: all
+  connection: local
+  become: true
   roles:
    - role: geerlingguy.docker
      docker_users:
        - vagrant
   tasks:
-    - name: Install Make for use with the build process
-      package:
-        name: make
+    # => For ease of use, we will force the users default login locatino
+    # => to our test directory.
+    - name: Set the default login directory
+      lineinfile:
+        path: /home/vagrant/.bashrc
+        line: cd /vagrant/devops-coop.minecraft
         state: present
+
+    - name: Install Pip for use with the build process
+      package:
+        name: python-pip
+        state: present
+
+    # => 2019-07-06
+    # => Due to idempotency issues with Molecule, we will need to skip additional
+    # => installation attempts by checking to see if the binary exists.
+    - name: Check if the Molecule binary is installed
+      stat:
+        path: /usr/local/bin/molecule
+      register: molecule
+
+    - name: Install Molecule and Dependencies
+      pip:
+        name: molecule
+        state: present
+      when: not molecule.stat.exists
+
+    - name: Install Docker Compose Python Modules
+      pip:
+        name: docker-compose
+        state: present
+
+    # => Create the core Docker Images which will be used by the testing process
+    - name: Create core Docker Images for Molecule tests
+      docker_compose:
+        project_src: "/vagrant/devops-coop.minecraft/docker/{{ test_suite }}/"
+        build: yes
+        stopped: yes
+      with_items:
+        - trusty64
+        - xenial64
+        - centos7
+        - bionic64
+        - jessie64
+        - buster64
+      loop_control:
+        loop_var: test_suite
+
+    # => 2019-07-06
+    # => The docker_compose module does not support simply building the images
+    # => so this step will ensure that we remove the containers created rather
+    # => than leaving them idle.
+    - name: Remove composed containers
+      shell: docker rm -f `docker ps -a | grep {{suite}}_core_python* | awk '{print $1}'`
+      with_items:
+        - trusty64
+        - xenial64
+        - centos7
+        - bionic64
+        - buster64
+      loop_control:
+        loop_var: suite
