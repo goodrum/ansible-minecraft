@@ -28,8 +28,6 @@
   set_fact:
     minecraft_version_manifest_url: "{{ minecraft_versions | selectattr('id','match', (minecraft_version|string) ) | map(attribute='url')  | list | first }}"
 
-- debug: var=minecraft_version_manifest_url
-
 - name: Retrieve Versions Manifest
   get_url:
     url: "{{ minecraft_version_manifest_url }}"

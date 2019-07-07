@@ -7,16 +7,12 @@
 
 - name: install Minecraft dependencies
   apt:
-    name: "{{ item }}"
+    name: "{{ dependencies }}"
     state: present
     install_recommends: no
     default_release: "{{ (ansible_distribution_release == 'jessie') | ternary('jessie-backports', omit) }}"
-  with_items: "{{ dependencies }}"
 
 - name: install Spigot dependencies
   apt:
-    name: "{{ item }}"
-  with_items:
-    - git
-    - tar
+    name: ['git', 'tar']
   when: minecraft_server == 'spigot'

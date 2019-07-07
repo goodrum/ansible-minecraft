@@ -9,30 +9,43 @@
     that:
       - "minecraft_server in supported_minecraft_servers"
 
-- include: "{{ minecraft_hook_before_setup | default('empty.yml') }}"
+- name: Minecraft before setup hook
+  include_tasks: "{{ minecraft_hook_before_setup | default('empty.yml') }}"
 
-- include: setup/main.yml
+- name: Minecraft Install Pre-requisites
+  include_tasks: setup/main.yml
 
-- include: "{{ minecraft_hook_after_setup | default('empty.yml') }}"
+- name: Minecraft after setup hook
+  include_tasks: "{{ minecraft_hook_after_setup | default('empty.yml') }}"
 
-- include: "{{ minecraft_hook_before_download | default('empty.yml') }}"
+- name: Minecraft before download hook
+  include_tasks: "{{ minecraft_hook_before_download | default('empty.yml') }}"
 
-- include: download/main.yml
+- name: Minecraft Download Media
+  include_tasks: download/main.yml
 
-- include: "{{ minecraft_hook_after_download | default('empty.yml') }}"
+- name: Minecraft after download hook
+  include_tasks: "{{ minecraft_hook_after_download | default('empty.yml') }}"
 
-- include: "{{ minecraft_hook_before_install | default('empty.yml') }}"
+- name: Minecraft before install hook
+  include_tasks: "{{ minecraft_hook_before_install | default('empty.yml') }}"
 
-- include: install/main.yml
+- name: Minecraft Install Media
+  include_tasks: install/main.yml
 
-- include: "{{ minecraft_hook_after_install | default('empty.yml') }}"
+- name: Minecraft after install hook
+  include_tasks: "{{ minecraft_hook_after_install | default('empty.yml') }}"
 
-- include: acl.yml
+- name: Minecraft Configure ACL
+  include_tasks: acl.yml
 
-- include: configure.yml
+- name: Minecraft Configure Server Properties
+  include_tasks: configure.yml
 
-- include: "{{ minecraft_hook_before_start | default('empty.yml') }}"
+- name: Minecraft before start hook
+  include_tasks: "{{ minecraft_hook_before_start | default('empty.yml') }}"
 
 - meta: flush_handlers
 
-- include: "{{ minecraft_hook_after_start | default('empty.yml') }}"
+- name: Minecraft after start hook
+  include_tasks: "{{ minecraft_hook_after_start | default('empty.yml') }}"
