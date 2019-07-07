@@ -10,6 +10,12 @@ platforms:
     image: minecraft_xenial64:python2
     privileged: True
     command: /sbin/init
+scenario:
+  name: default
+  test_sequence:
+    - lint
+    - syntax
+    - destroy
 provisioner:
   name: ansible
   lint:

@@ -21,3 +21,5 @@ minecraft_server_properties:
   server-port: "{{ minecraft_server_port }}"
 
 minecraft_spigot_url: https://hub.spigotmc.org/jenkins/job/BuildTools/lastSuccessfulBuild/artifact/target/BuildTools.jar
+
+minecraft_tmp_directory: /tmp/ansible-minecraft

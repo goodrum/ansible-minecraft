@@ -1,3 +1,4 @@
+---
 - name: create Spigot build directory
   file:
     path: "{{ minecraft_home }}/build"

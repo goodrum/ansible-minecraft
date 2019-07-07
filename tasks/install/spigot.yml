@@ -1,3 +1,4 @@
+---
 - include: latest.yml
   when: minecraft_version == 'latest'
 

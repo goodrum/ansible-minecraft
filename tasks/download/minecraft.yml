@@ -1,3 +1,4 @@
+---
 - include: fetch_version_download.yml
   when: minecraft_server_download_url is undefined
 
@@ -7,5 +8,5 @@
     dest: "{{ minecraft_home }}/minecraft_server.{{ minecraft_version_latest | default(minecraft_version) }}.jar"
     owner: "{{ minecraft_user }}"
     group: "{{ minecraft_group }}"
-    checksum: "{{minecraft_server_download_checksum}}"
+    checksum: "{{ minecraft_server_download_checksum }}"
     mode: '0755'
