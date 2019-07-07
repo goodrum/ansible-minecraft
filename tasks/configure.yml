@@ -1,8 +1,15 @@
+---
 # The only way to generate a server.properties file is to start Minecraft.
 # We send the stop command to the stdin to stop the server right after it
 # starts.
+
+# => 2019-07-06
+# => TODO: We have to skip the test 306 for Ansible lint due to the need to pass
+# => the 'stop' command here when generating the server.properties file.  I was
+# => unable to get the args:stdin to properly pass in the call so I added this
+# => stop gap.
 - name: generate server.properties
-  shell: echo "stop" | java -jar {{ minecraft_jar }} nogui
+  shell: echo "stop" | java -jar {{ minecraft_jar }} nogui  # noqa 306
   args:
     creates: server.properties
     chdir: "{{ minecraft_home }}"

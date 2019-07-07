@@ -13,13 +13,7 @@
     - minecraft.service
     - minecraft.socket
   notify:
-    - restart Minecraft
-  register: systemd_service_config
-
-- name: reload systemd
-  command: systemctl daemon-reload
-  become: true
-  when: systemd_service_config.changed
+    - reload systemd
 
 - name: configure console directory
   template:

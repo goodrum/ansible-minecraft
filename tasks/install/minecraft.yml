@@ -1,3 +1,4 @@
+---
 - name: symlink Minecraft server
   file:
     src: "{{ minecraft_home }}/minecraft_server.{{ minecraft_version_latest | default(minecraft_version) }}.jar"

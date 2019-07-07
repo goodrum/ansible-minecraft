@@ -1,6 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+from ansible.module_utils.urls import *
+from ansible.module_utils.basic import *
 """
 Generate Minecraft server files (ACLs and server.properties).
 """
@@ -146,7 +148,8 @@ class ServerProperties(ServerFile):
         # server.properties are represented by "true" and "false" instead of
         # Python's "True" and "False", so convert them explicitly.
         for name, value in properties.iteritems():
-            properties[name] = str(value).lower() if isinstance(value, bool) else str(value)
+            properties[name] = str(value).lower() if isinstance(
+                value, bool) else str(value)
 
         with open(self.stats.path) as filein:
             for line in filein:
@@ -157,7 +160,8 @@ class ServerProperties(ServerFile):
                 name, eq, val = [x.strip() for x
                                  in line.strip().partition('=')]
                 if eq and name in properties:
-                    self.newlines.append('{0}={1}\n'.format(name, properties[name]))
+                    self.newlines.append(
+                        '{0}={1}\n'.format(name, properties[name]))
                     current = properties.pop(name)
                     if current != val:
                         self._content_changed = True
@@ -181,6 +185,7 @@ class ACL(ServerFile):
     """
     A Minecraft ACL.
     """
+
     def __init__(self, module):
         super(ACL, self).__init__(module)
         self.acl = []
@@ -213,6 +218,7 @@ class Banlist(ACL):
     """
     A generic Minecraft banlist.
     """
+
     def __init__(self, module, created=None, expires=None, reason=None):
         super(Banlist, self).__init__(module)
         self.created = created if created else dt.utcnow()
@@ -234,6 +240,7 @@ class BannedPlayers(Banlist):
 
     The module "values" argument should be a list of usernames.
     """
+
     def __init__(self, module):
         super(BannedPlayers, self).__init__(module)
         uuids = get_uuids(self.values)
@@ -250,6 +257,7 @@ class BannedIPs(Banlist):
 
     The module "values" argument should be a list of IP addresses.
     """
+
     def __init__(self, module):
         super(BannedIPs, self).__init__(module)
         for ip in self.values:
@@ -264,6 +272,7 @@ class Whitelist(ACL):
 
     The module "values" argument should be a list of usernames.
     """
+
     def __init__(self, module):
         """
         Generate a Minecraft whitelist from a list of usernames.
@@ -280,6 +289,7 @@ class Oplist(Whitelist):
 
     The module "values" argument should be a list of usernames.
     """
+
     def __init__(self, module):
         """
         Generate a Minecraft oplist from a list of usernames.
@@ -371,8 +381,6 @@ def main(argv=None):
 
 
 # import module snippets
-from ansible.module_utils.basic import *
-from ansible.module_utils.urls import *
 
 if __name__ == '__main__':
     main()

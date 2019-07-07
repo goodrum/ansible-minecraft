@@ -1,3 +1,4 @@
+---
 - name: include OS-specific variables
   include_vars: "{{ item }}"
   with_first_found:
@@ -40,4 +41,3 @@
 
 - include: systemd.yml
   when: minecraft_process_control == 'systemd'
-

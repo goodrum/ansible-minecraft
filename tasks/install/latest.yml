@@ -1,0 +1,7 @@
+---
+# => 2019-07-06
+# => TODO: Determine the purpose of this call.  Commenting out for now as
+# => there is no file to include but seems to be important for 'spigot'
+# => installations.
+- debug:
+    msg: "Included latest.yml"

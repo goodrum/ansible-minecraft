@@ -2,6 +2,12 @@
 # Chain handlers to support multiple process supervisors. A task simply needs
 # to notify 'restart Minecraft', which will trigger the supervisor-specific
 # actions.
+
+- name: reload systemd
+  systemd:
+    daemon_reload: yes
+  become: true
+
 - name: restart Minecraft
   debug:
     msg: restarting Minecraft using {{ minecraft_process_control }}
@@ -18,7 +24,7 @@
 
 - name: restart Minecraft (systemd)
   service:
-    name: "{{ minecraft_service_name}}"
+    name: "{{ minecraft_service_name }}"
     state: restarted
   when: minecraft_process_control == 'systemd'
 
@@ -31,7 +37,9 @@
     - enable service (systemd)
 
 - name: enable service (supervisor)
-  command: supervisorctl update
+  supervisorctl:
+    path: "/etc/supervisor/conf.d/{{ minecraft_service_name }}.conf"
+    state: restarted
   become: true
   when: minecraft_process_control == 'supervisor'
 
