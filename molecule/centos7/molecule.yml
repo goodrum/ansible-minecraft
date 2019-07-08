@@ -8,6 +8,7 @@ lint:
 platforms:
   - name: minecraft_centos7
     image: minecraft_centos7:python2
+    pull: false
     privileged: True
     command: /sbin/init
 provisioner:

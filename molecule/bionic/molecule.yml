@@ -8,6 +8,7 @@ lint:
 platforms:
   - name: minecraft_bionic64
     image: minecraft_bionic64:python2
+    pull: false
     privileged: True
     command: /lib/systemd/systemd
 provisioner:

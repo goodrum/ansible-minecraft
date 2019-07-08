@@ -1,0 +1,18 @@
+---
+- name: Converge
+  hosts: all
+  roles:
+    - role: devops-coop.minecraft
+      minecraft_server_properties:
+        server-port: 25565
+        rcon.port: 25564
+        enable-rcon: true
+        rcon.password: password
+      minecraft_hook_before_setup: "../../tests/hooks/before_setup.yml"
+      minecraft_hook_after_setup: "../../tests/hooks/after_setup.yml"
+      minecraft_hook_before_download: "../../tests/hooks/before_download.yml"
+      minecraft_hook_after_download: "../../tests/hooks/after_download.yml"
+      minecraft_hook_before_install: "../../tests/hooks/before_install.yml"
+      minecraft_hook_after_install: "../../tests/hooks/after_install.yml"
+      minecraft_hook_before_start: "../../tests/hooks/before_start.yml"
+      minecraft_hook_after_start: "../../tests/hooks/after_start.yml"

@@ -8,6 +8,7 @@ lint:
 platforms:
   - name: minecraft_buster64
     image: minecraft_buster64:python2
+    pull: false
     privileged: True
     command: /sbin/init
 provisioner:
