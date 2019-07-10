@@ -8,6 +8,7 @@ lint:
 platforms:
   - name: minecraft_default
     image: minecraft_xenial64:python2
+    pull: false
     privileged: True
     command: /sbin/init
 scenario:

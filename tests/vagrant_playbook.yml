@@ -15,11 +15,6 @@
         line: cd /vagrant/devops-coop.minecraft
         state: present
 
-    - name: Install Pip for use with the build process
-      package:
-        name: python-pip
-        state: present
-
     # => 2019-07-06
     # => Due to idempotency issues with Molecule, we will need to skip additional
     # => installation attempts by checking to see if the binary exists.
@@ -39,19 +34,38 @@
         name: docker-compose
         state: present
 
+    # => 2019-07-06
+    # => We will scan and collect any directory in the <role>/docker/ directory
+    # => and add it to a list to use to create the test suites
+    - name: Collect all Docker Test Suites
+      find:
+        paths: /vagrant/devops-coop.minecraft/docker
+        file_type: directory
+        depth: 1
+      register: docker_details
+
+    - name: Collate Docker Test Suites
+      set_fact:
+        docker_configs: "{{ docker_details.files |  map(attribute='path') | list }}"
+
+    - name: Preparing Docker Images for test suite consumption
+      debug:
+        msg:
+        - This process will take several minutes to complete as each test suite is staged. There are {{ docker_configs | length }} Docker base
+        - test suites with at least two images each
+
+    # => 2019-07-07
+    # => TODO: Starting in Ansible 2.8, This is an alias for docker_compose. This name has been deprecated.
+    # => Since we are currently hard-coding our workstation Ansible to 2.7+ due to testinfra issues,
+    # => we will need to retain the 'docker_service' module name
+    # =>
     # => Create the core Docker Images which will be used by the testing process
     - name: Create core Docker Images for Molecule tests
-      docker_compose:
-        project_src: "/vagrant/devops-coop.minecraft/docker/{{ test_suite }}/"
+      docker_service:
+        project_src: "{{ test_suite }}/"
         build: yes
         stopped: yes
-      with_items:
-        - trusty64
-        - xenial64
-        - centos7
-        - bionic64
-        - jessie64
-        - buster64
+      with_items: "{{ docker_configs }}"
       loop_control:
         loop_var: test_suite
 
@@ -59,13 +73,11 @@
     # => The docker_compose module does not support simply building the images
     # => so this step will ensure that we remove the containers created rather
     # => than leaving them idle.
+    # =>
+    # => Note: We are spliting the test_suite name out of the paths to the docker
+    # => directory so that we can delete the stoped containers.
     - name: Remove composed containers
-      shell: docker rm -f `docker ps -a | grep {{suite}}_core_python* | awk '{print $1}'`
-      with_items:
-        - trusty64
-        - xenial64
-        - centos7
-        - bionic64
-        - buster64
+      shell: docker rm -f `docker ps -a | grep {{ test_suite.split('/')[-1] }}_core_python* | awk '{print $1}'`
+      with_items: "{{ docker_configs }}"
       loop_control:
-        loop_var: suite
+        loop_var: test_suite

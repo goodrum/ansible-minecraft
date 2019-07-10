@@ -8,6 +8,7 @@ lint:
 platforms:
   - name: minecraft_trusty64
     image: minecraft_trusty64:python2
+    pull: false
     privileged: True
     command: /sbin/init
 provisioner:

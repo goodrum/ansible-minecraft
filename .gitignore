@@ -4,3 +4,7 @@
 .vagrant/*
 tmp/*
 *.log
+
+*.retry
+**/__pycache__
+**/.cache

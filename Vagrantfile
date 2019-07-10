@@ -24,18 +24,24 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         # => Modified the process to perform the installation of Ansible and
         # => ultimately rely on this process to perform the required feature
         # => installation and configuration
+        # =>
+        # => 2019-07-07
+        # => TODO: Remove Ansible version restriction
+        # => https://github.com/ansible/molecule/issues/1727
         host.vm.provision "shell", inline: <<-SHELL
             echo ""
             echo "Perform a cache update"
             echo "########################"
             sudo apt-get update
             echo ""
-            echo "Configure Ansible Repository and Install Package"
+            echo "Install Python and Pip"
             echo "########################"
-            sudo apt-get install -y software-properties-common
-            sudo apt-add-repository ppa:ansible/ansible -y
-            sudo apt-get update
-            sudo apt-get install ansible -y
+            sudo apt-get install -y python python-pip
+            echo ""
+            echo "########################"
+            echo "Upgrade Pip to recent and install Ansible"
+            sudo pip install --upgrade pip
+            sudo pip install "ansible==2.7.12"
             echo ""
             echo "Verify Ansible Versions"
             echo "########################"
@@ -47,6 +53,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
             echo "########################"
             sudo chown -R vagrant /home/vagrant
             sudo chmod -R 0700 /home/vagrant
+            echo ""
         SHELL
 
         # => 2019-06-29
