@@ -8,3 +8,6 @@ tmp/*
 *.retry
 **/__pycache__
 **/.cache
+
+# Python Virtual Environment
+.venv

@@ -147,9 +147,16 @@ class ServerProperties(ServerFile):
         # Convert all values to strings.  The default booleans in
         # server.properties are represented by "true" and "false" instead of
         # Python's "True" and "False", so convert them explicitly.
-        for name, value in properties.iteritems():
-            properties[name] = str(value).lower() if isinstance(
-                value, bool) else str(value)
+        # 2021-01-31
+        # Added a try...except since iteritems only works in Python2
+        try:
+            for name, value in properties.iteritems():
+                properties[name] = str(value).lower() if isinstance(
+                    value, bool) else str(value)
+        except:
+            for name, value in properties.items():
+                properties[name] = str(value).lower() if isinstance(
+                    value, bool) else str(value)
 
         with open(self.stats.path) as filein:
             for line in filein:
@@ -168,9 +175,16 @@ class ServerProperties(ServerFile):
                 else:
                     self.newlines.append(line)
 
-        for name, value in properties.iteritems():
-            self.newlines.append('{0}={1}\n'.format(name, value))
-            self._content_changed = True
+        # 2021-01-31
+        # Added a try...except since iteritems only works in Python2
+        try:
+            for name, value in properties.iteritems():
+                self.newlines.append('{0}={1}\n'.format(name, value))
+                self._content_changed = True
+        except:
+            for name, value in properties.items():
+                self.newlines.append('{0}={1}\n'.format(name, value))
+                self._content_changed = True
 
     @property
     def content(self):
