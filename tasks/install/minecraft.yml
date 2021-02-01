@@ -6,8 +6,15 @@
     owner: "{{ minecraft_user }}"
     group: "{{ minecraft_group }}"
     state: link
+  register: symlink_created
   notify:
     - restart Minecraft
+
+- name: Update Ownership of Symlink
+  shell: "chown -h {{ minecraft_user }}:{{ minecraft_group}} {{ minecraft_home }}/minecraft_server.jar"
+  args:
+    warn: false
+  when: symlink_created.changed
 
 - name: agree to EULA
   copy:

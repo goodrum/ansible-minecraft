@@ -1,0 +1,30 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: docker
+platforms:
+  - name: minecraft_xenial64_python2
+    image: minecraft_xenial64:python2
+    pull: false
+    privileged: True
+    command: /sbin/init
+  - name: minecraft_xenial64_python3
+    image: minecraft_xenial64:python3
+    pull: false
+    privileged: True
+    command: /sbin/init
+provisioner:
+  name: ansible
+  config_options:
+    defaults:
+      verbosity: 0
+  playbooks:
+    converge: ../shared_playbooks/converge_latest.yml
+  lint:
+    name: ansible-lint
+verifier:
+  name: testinfra
+  directory: ../shared_tests/
+  lint:
+    name: flake8

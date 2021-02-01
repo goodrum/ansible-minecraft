@@ -3,8 +3,10 @@ dependency:
   name: galaxy
 driver:
   name: docker
-lint:
-  name: yamllint
+lint: |
+  set -e
+  yamllint .
+  ansible-lint .
 platforms:
   - name: minecraft_default
     image: minecraft_xenial64:python2
@@ -21,6 +23,7 @@ provisioner:
   name: ansible
   lint:
     name: ansible-lint
+    enabled: True
 verifier:
   name: testinfra
   lint:

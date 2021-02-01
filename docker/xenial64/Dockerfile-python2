@@ -11,9 +11,10 @@ RUN apt-get update -y \
       curl \
       python \
       python-dev \
+      python-pip \
       coreutils \
       net-tools \
-    && curl https://bootstrap.pypa.io/get-pip.py | python \
+    # && curl https://bootstrap.pypa.io/get-pip.py | python \
     && apt-get autoremove \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
