@@ -3,19 +3,27 @@ dependency:
   name: galaxy
 driver:
   name: docker
-lint:
-  name: yamllint
 platforms:
-  - name: minecraft_centos7
+  - name: minecraft_centos7_python2
     image: minecraft_centos7:python2
     pull: false
     privileged: True
-    command: /sbin/init
+    command: /lib/systemd/systemd
+  - name: minecraft_centos7_python3
+    image: minecraft_centos7:python3
+    pull: false
+    privileged: True
+    command: /lib/systemd/systemd
 provisioner:
   name: ansible
+  playbooks:
+    converge: ../shared_playbooks/converge_latest.yml
   lint:
     name: ansible-lint
 verifier:
   name: testinfra
+  directory: ../shared_tests/
+  additional_files_or_dirs:
+    - ../shared_tests/test_minecraft_latest.py
   lint:
     name: flake8
