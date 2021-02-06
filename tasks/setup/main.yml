@@ -36,6 +36,13 @@
     minecraft_jar: spigot.jar
   when: minecraft_server == 'spigot'
 
+- name: Check if Ubuntu and set process_control_version
+  set_fact:
+    minecraft_process_control: supervisor
+  when:
+    - ansible_distribution == 'Ubuntu'
+    - ansible_distribution_version > '16.04'
+
 - include_tasks: supervisor.yml
   when: minecraft_process_control == 'supervisor'
 

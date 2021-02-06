@@ -1,0 +1,119 @@
+---
+# Verify Minecraft installations for Supervisor
+
+- name: Verify
+  hosts: all
+  gather_facts: false
+  vars:
+    minecraft_user: "{{ lookup('env', 'MINECRAFT_USER')|default('minecraft', true) }}"
+    minecraft_group: "{{ lookup('env', 'MINECRAFT_GROUP')|default('minecraft', true) }}"
+    minecraft_dir: "{{ lookup('env', 'MINECRAFT_DIR') | default('/srv/minecraft', true) }}"
+    minecraft_service_name: "{{ lookup('env', 'MINECRAFT_SERVICE_NAME') | default(minecraft_user, true) }}"
+    minecraft_socket_name_default: "{{minecraft_service_name}}.socket"
+    minecraft_socket_name: "{{ lookup('env', 'MINECRAFT_SOCKET_NAME') | default(minecraft_socket_name_default, true) }}"
+    minecraft_process_control: "{{ lookup('env', 'MINECRAFT_PROCESS_CONTROL') | default('systemd', true) }}"
+    minecraft_service_port: "{{ lookup('env', 'MINECRAFT_SERVICE_PORT') | default('25565', true) }}"
+    minecraft_socket_port: "{{ lookup('env', 'MINECRAFT_SOCKET_PORT') | default('25564', true) }}"
+  tasks:
+    - name: Load local users and groups
+      getent:
+        database: "{{ database }}"
+      with_items:
+        - passwd
+        - group
+      loop_control:
+        loop_var: database
+
+    - name: Load local services (systemd)
+      service_facts:
+      register: all_services
+      when: minecraft_process_control == 'systemd'
+
+    - name: Load local services (supervisor)
+      shell: "supervisorctl status {{ minecraft_service_name }} 2>/dev/null || echo 'missing' "
+      changed_when: false
+      register: supervisor_services
+      when: minecraft_process_control == 'supervisor'
+
+    - name: Load local listening ports
+      listen_ports_facts:
+
+    - name: Find Minecraft installation
+      stat:
+        path: "{{ minecraft_dir }}"
+      register: minecraft_installation
+
+    - name: Find Minecraft versionless executable
+      stat:
+        path: "{{ minecraft_dir }}/minecraft_server.jar"
+      register: minecraft_installation_exe
+
+    - name: Find Minecraft EULA
+      stat:
+        path: "{{ minecraft_dir }}/eula.txt"
+      register: minecraft_installation_eula
+
+    - name: Load Eula Content
+      shell: "cat {{ minecraft_dir }}/eula.txt 2>/dev/null|| echo 'no-content' "
+      changed_when: false
+      register: minecraft_installation_eula_content
+
+    # Assertions
+    - name: Verify Minecraft User and Group exists
+      assert:
+        that:
+          - "minecraft_group in getent_group"
+          - "minecraft_user in getent_passwd"
+
+    - name: Verify Minecraft Installation Directory
+      assert:
+        that:
+          - minecraft_installation.stat.exists
+          - minecraft_installation.stat.isdir
+          # GID from getent_group is always element 1
+          - minecraft_installation.stat.gid == (getent_group[minecraft_group][1]|int)
+          # UID from getent_group is always element 1
+          - minecraft_installation.stat.uid == (getent_passwd[minecraft_user][1]|int)
+
+
+    - name: Verify Minecraft versionless executable
+      assert:
+        that:
+          - minecraft_installation_exe.stat.exists
+          - minecraft_installation_exe.stat.islnk
+          # GID from getent_group is always element 1
+          - minecraft_installation_exe.stat.gid == (getent_group[minecraft_group][1]|int)
+          # UID from getent_group is always element 1
+          - minecraft_installation_exe.stat.uid == (getent_passwd[minecraft_user][1]|int)
+
+    - name: Verify Minecraft EULA
+      assert:
+        that:
+          - minecraft_installation_eula.stat.exists
+          - minecraft_installation_eula_content.stdout == 'eula=true'
+
+    - name: Verify Minecraft Service (systemd)
+      assert:
+        that:
+          - minecraft_service_name in all_services
+          - all_services[minecraft_service_name]['state'] == 'running'
+          - minecraft_socket_name in all_services
+          - all_services[minecraft_socket_name]['state'] == 'running'
+      when: minecraft_process_control == 'systemd'
+
+    - name: Verify Minecraft listening on ports
+      assert:
+        that:
+          - (minecraft_service_port|int) in (ansible_facts.tcp_listen  | map(attribute='port') | sort | list)
+          - (minecraft_socket_port|int) in (ansible_facts.tcp_listen  | map(attribute='port') | sort | list)
+
+    - name: Verify Minecraft Service (supervisor)
+      assert:
+        that:
+          - minecraft_service_name in supervisor_services.stdout
+          - "'RUNNING' in (supervisor_services.stdout.split())"
+      when: minecraft_process_control == 'supervisor'
+
+    - name: Finalize Verification
+      debug:
+        msg: "Successfully completed all tests and verifications"

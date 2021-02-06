@@ -9,11 +9,11 @@ platforms:
     pull: false
     privileged: True
     command: /sbin/init
-  # - name: minecraft_trusty64_python3
-  #   image: minecraft_trusty64:python3
-  #   pull: false
-  #   privileged: True
-  #   command: /lib/systemd/systemd
+  - name: minecraft_trusty64_python3
+    image: minecraft_trusty64:python3
+    pull: false
+    privileged: True
+    command: /sbin/init
 provisioner:
   name: ansible
   config_options:
@@ -21,14 +21,12 @@ provisioner:
       verbosity: 0
   playbooks:
     converge: ../shared_playbooks/converge_latest.yml
+    verify: ../shared_tests/verify.yml
   lint:
     name: ansible-lint
   env:
     MINECRAFT_PROCESS_CONTROL: "supervisor"
 verifier:
-  name: testinfra
-  directory: ../shared_tests/
-  additional_files_or_dirs:
-    - ../shared_tests/test_minecraft_latest.py
+  name: ansible
   lint:
     name: flake8
