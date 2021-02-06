@@ -1,0 +1,34 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: docker
+platforms:
+  - name: minecraft_trusty64_python2
+    image: minecraft_trusty64:python2
+    pull: false
+    privileged: True
+    command: /sbin/init
+  # - name: minecraft_trusty64_python3
+  #   image: minecraft_trusty64:python3
+  #   pull: false
+  #   privileged: True
+  #   command: /lib/systemd/systemd
+provisioner:
+  name: ansible
+  config_options:
+    defaults:
+      verbosity: 0
+  playbooks:
+    converge: ../shared_playbooks/converge_latest.yml
+  lint:
+    name: ansible-lint
+  env:
+    MINECRAFT_PROCESS_CONTROL: "supervisor"
+verifier:
+  name: testinfra
+  directory: ../shared_tests/
+  additional_files_or_dirs:
+    - ../shared_tests/test_minecraft_latest.py
+  lint:
+    name: flake8

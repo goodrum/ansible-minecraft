@@ -5,12 +5,30 @@
     repo: deb http://ftp.debian.org/debian jessie-backports main
   when: ansible_distribution_release == 'jessie'
 
+- name: install trusty-openjdk repository
+  apt_repository:
+    repo: ppa:openjdk-r/ppa
+  when: ansible_distribution_release == 'trusty'
+
 - name: install Minecraft dependencies
   apt:
     name: "{{ dependencies }}"
     state: present
     install_recommends: no
     default_release: "{{ (ansible_distribution_release == 'jessie') | ternary('jessie-backports', omit) }}"
+
+- name: install java8 on trusty
+  apt:
+    name: openjdk-8-jdk
+    state: present
+    install_recommends: no
+  when: ansible_distribution_release == 'trusty'
+
+- name: correct java version on trusty
+  alternatives:
+    name: java
+    path: /usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java
+  when: ansible_distribution_release == 'trusty'
 
 - name: install Spigot dependencies
   apt:

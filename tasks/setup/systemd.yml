@@ -17,6 +17,11 @@
   notify:
     - reload systemd
 
+- name: Create /etc/tmpfiles.d/ if not exists
+  file:
+    path: /etc/tmpfiles.d/
+    state: directory
+
 - name: configure console directory
   template:
     src: tmpfiles.d/minecraft.conf.j2

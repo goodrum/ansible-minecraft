@@ -1,0 +1,5 @@
+molecule==3.2.3
+molecule[docker,lint,ansible]
+pytest==6.2.2
+pytest-testinfra==6.1.0
+pep8==1.7.1
