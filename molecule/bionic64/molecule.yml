@@ -1,0 +1,33 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: docker
+platforms:
+  - name: minecraft_bionic64_python2
+    image: minecraft_bionic64:python2
+    pull: false
+    privileged: True
+    command: /lib/systemd/systemd
+  - name: minecraft_bionic64_python3
+    image: minecraft_bionic64:python3
+    pull: false
+    privileged: True
+    command: /lib/systemd/systemd
+provisioner:
+  name: ansible
+  config_options:
+    defaults:
+      verbosity: 0
+  playbooks:
+    prepare: ../shared_playbooks/prepare.yml
+    converge: ../shared_playbooks/converge_latest.yml
+    verify: ../shared_tests/verify.yml
+  env:
+    MINECRAFT_PROCESS_CONTROL: "supervisor"
+  lint:
+    name: ansible-lint
+verifier:
+  name: ansible
+  lint:
+    name: flake8

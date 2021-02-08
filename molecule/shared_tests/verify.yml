@@ -95,10 +95,13 @@
     - name: Verify Minecraft Service (systemd)
       assert:
         that:
-          - minecraft_service_name in all_services
-          - all_services[minecraft_service_name]['state'] == 'running'
-          - minecraft_socket_name in all_services
-          - all_services[minecraft_socket_name]['state'] == 'running'
+          - service in ansible_facts.services
+          - ansible_facts.services[service]['state'] == 'running'
+      with_items:
+        - "{{ minecraft_service_name }}.service"
+        - "{{ minecraft_service_name }}.socket"
+      loop_control:
+        loop_var: service
       when: minecraft_process_control == 'systemd'
 
     - name: Verify Minecraft listening on ports

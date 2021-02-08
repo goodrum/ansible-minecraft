@@ -6,11 +6,11 @@
     - "{{ ansible_os_family }}.yml"
 
 - name: include Debian-specific tasks
-  include_tasks: Debian.yml
+  include_tasks: setup/Debian.yml
   when: ansible_os_family == 'Debian'
 
 - name: include Red Hat-specific tasks
-  include_tasks: RedHat.yml
+  include_tasks: setup/RedHat.yml
   when: ansible_os_family == 'RedHat'
 
 - name: create Minecraft group
@@ -36,6 +36,8 @@
     minecraft_jar: spigot.jar
   when: minecraft_server == 'spigot'
 
+# 2021-02-06
+# Using systemd with Ubuntu 18.04 is not supported. Use Supervisor instead
 - name: Check if Ubuntu and set process_control_version
   set_fact:
     minecraft_process_control: supervisor
@@ -43,8 +45,13 @@
     - ansible_distribution == 'Ubuntu'
     - ansible_distribution_version > '16.04'
 
-- include_tasks: supervisor.yml
+- debug:
+    var: minecraft_process_control
+
+- name: Include Supervisor tasks
+  include_tasks: setup/supervisor.yml
   when: minecraft_process_control == 'supervisor'
 
-- include_tasks: systemd.yml
+- name: Include Systemd tasks
+  include_tasks: setup/systemd.yml
   when: minecraft_process_control == 'systemd'
