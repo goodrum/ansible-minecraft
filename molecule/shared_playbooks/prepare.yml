@@ -10,6 +10,12 @@
         update_cache: yes
       when: ansible_os_family == 'Debian'
 
+    - name: Install procps for Debian Servers (Required for Port Verification Integration tests)
+      apt:
+        name: procps
+        state: present
+      when: ansible_distribution == 'Debian'
+
     - name: Update Cache
       yum:
         update_cache: yes

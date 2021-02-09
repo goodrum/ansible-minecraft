@@ -1,14 +1,30 @@
 ---
 # Required for Java 1.8
-- name: install jessie-backports repository
-  apt_repository:
-    repo: deb http://ftp.debian.org/debian jessie-backports main
-  when: ansible_distribution_release == 'jessie'
+- name: Configure Additional Repositories for Debian/Ubuntu
+  block:
+    - name: install jessie-backports repository
+      apt_repository:
+        repo: deb http://ftp.debian.org/debian jessie-backports main
+      when: ansible_distribution_release == 'jessie'
+      register: jessie_backports
 
-- name: install trusty-openjdk repository
-  apt_repository:
-    repo: ppa:openjdk-r/ppa
-  when: ansible_distribution_release == 'trusty'
+    - name: install buster-backports repository
+      apt_repository:
+        repo: deb http://security.debian.org/debian-security stretch/updates main
+      when: ansible_distribution_release == 'buster'
+      register: buster_backports
+
+    - name: install trusty-openjdk repository
+      apt_repository:
+        repo: ppa:openjdk-r/ppa
+      when: ansible_distribution_release == 'trusty'
+      register: trusty_backports
+
+    - name: Update Cache (Apt)
+      apt:
+        update_cache: yes
+      when: jessie_backports.changed or buster_backports.changed or trusty_backports.changed
+  when: ansible_os_family == 'Debian'
 
 - name: install Minecraft dependencies
   apt:
