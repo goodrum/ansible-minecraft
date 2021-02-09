@@ -93,15 +93,30 @@
           - minecraft_installation_eula_content.stdout == 'eula=true'
 
     - name: Verify Minecraft Service (systemd)
-      assert:
-        that:
-          - service in ansible_facts.services
-          - ansible_facts.services[service]['state'] == 'running'
-      with_items:
-        - "{{ minecraft_service_name }}.service"
-        - "{{ minecraft_service_name }}.socket"
-      loop_control:
-        loop_var: service
+      block:
+        # 2021-02-08
+        # Ansible does not collect Socket information in ansible_facts.services
+        # https://github.com/ansible/ansible/issues/3417
+        - name: Get Minecraft Socket
+          shell: systemctl list-units | grep minecraft.socket || echo "no-data"
+          register: system_sockets
+          changed_when: false
+
+        - name: Check Service Status
+          assert:
+            that:
+              - service in ansible_facts.services
+              - ansible_facts.services[service]['state'] == 'running'
+          with_items:
+            - "{{ minecraft_service_name }}.service"
+          loop_control:
+            loop_var: service
+
+        - name: Check Socket Status
+          assert:
+            that:
+              - '"{{ minecraft_service_name }}.socket" in system_sockets.stdout'
+              - '"running" in system_sockets.stdout'
       when: minecraft_process_control == 'systemd'
 
     - name: Verify Minecraft listening on ports
