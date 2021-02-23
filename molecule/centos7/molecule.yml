@@ -17,13 +17,12 @@ platforms:
 provisioner:
   name: ansible
   playbooks:
+    prepare: ../shared_playbooks/prepare.yml
     converge: ../shared_playbooks/converge_latest.yml
+    verify: ../shared_tests/verify.yml
   lint:
     name: ansible-lint
 verifier:
-  name: testinfra
-  directory: ../shared_tests/
-  additional_files_or_dirs:
-    - ../shared_tests/test_minecraft_latest.py
+  name: ansible
   lint:
     name: flake8

@@ -1,7 +1,0 @@
----
-- name: Converge
-  hosts: all
-  tasks:
-    - name: "Include devops-coop.minecraft"
-      include_role:
-        name: "devops-coop.minecraft"
