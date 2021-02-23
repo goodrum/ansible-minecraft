@@ -1,6 +1,6 @@
 # vim: set ft=dockerfile:
 
-FROM debian:jessie
+FROM debian:stretch
 
 # Colour output.
 ENV TERM=xterm
@@ -11,9 +11,10 @@ RUN apt-get update -y \
       curl \
       python \
       python-dev \
+      python-pip \
       coreutils \
       net-tools \
-    && curl https://bootstrap.pypa.io/get-pip.py | python \
     && apt-get autoremove \
     && apt-get clean \
+    && ln -snf /lib/systemd/systemd /sbin/init \
     && rm -rf /var/lib/apt/lists/*
