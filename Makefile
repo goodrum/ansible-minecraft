@@ -2,6 +2,7 @@ BOXES := $(notdir $(wildcard docker/*))
 
 PROCESS_CONTROL ?= systemd
 SERVER          ?= minecraft
+DOCKER_DIRECTORY:= docker
 
 define USAGE
 targets:
@@ -28,14 +29,33 @@ endef
 
 is_machine_target = $(if $(findstring $(firstword $(MAKECMDGOALS)),$(BOXES)),true,false)
 
-all:
-	docker-compose build
+list:
+	@(echo "List of available Boxes")
+	@(ls -m $(DOCKER_DIRECTORY)/ | tr ',' '\n')
+
+build:
+ifeq (true,$(call is_machine_target))
+	@(echo "Preparing Build for Box: $(firstword $(MAKECMDGOALS))")
+	docker-compose --file $(DOCKER_DIRECTORY)/$(firstword $(MAKECMDGOALS))/docker-compose.yml build
+else
+	@(echo "Preparing to Build all Boxes")
+	@(\
+	for test_suite in `ls -m $(DOCKER_DIRECTORY)/ | tr ',' ' '` ; do \
+		docker-compose --file $(DOCKER_DIRECTORY)/$${test_suite}/docker-compose.yml build ; \
+	done \
+	)
+endif
 
 clean:
 ifeq (true,$(call is_machine_target))
-	docker rmi -f ansibleminecraft_$(firstword $(MAKECMDGOALS))
+	@(echo "Preparing Cleanup for Box: $(firstword $(MAKECMDGOALS))")
+	-docker images -q --filter "dangling=true" | xargs docker rmi -f
+	-docker images -q molecule_local/minecraft_$(firstword $(MAKECMDGOALS)) | xargs docker rmi -f
+	-docker images -q minecraft_$(firstword $(MAKECMDGOALS)) | xargs docker rmi -f
 else
-	-docker images -q ansibleminecraft* | xargs docker rmi -f
+	-docker images -q molecule_local/minecraft* | xargs docker rmi -f
+	-docker images -q minecraft_* | xargs docker rmi -f
+	-docker images -q --filter "dangling=true" | xargs docker rmi -f
 endif
 
 help:
@@ -43,18 +63,26 @@ help:
 
 test:
 ifeq (true,$(call is_machine_target))
-	./scripts/ci.sh $(firstword $(MAKECMDGOALS)) $(PROCESS_CONTROL) $(SERVER)
+	molecule test -s $(firstword $(MAKECMDGOALS))
 else
-	$(error `test` requires a machine name, see `make help`)
+	@(\
+	for test_suite in $(BOXES) ; do \
+		molecule test -s $${test_suite} ; \
+	done \
+	)
 endif
 
 $(BOXES):
-# Don't build an image just to delete it.
-ifeq (,$(findstring clean,$(lastword $(MAKECMDGOALS))))
-	{ docker images ansibleminecraft_$@ | grep $@; } && exit || docker-compose build $@
+	@(echo "Managing Box: $(firstword $(MAKECMDGOALS)) with action $(lastword $(MAKECMDGOALS))")
+ifeq ($(firstword $(MAKECMDGOALS)),$(lastword $(MAKECMDGOALS)))
+	@(echo "Default Action is build")
+	docker-compose --file $(DOCKER_DIRECTORY)/$(firstword $(MAKECMDGOALS))/docker-compose.yml build
 endif
 
 .PHONY: all \
         clean \
         help \
-        test
+        test \
+		build \
+		all \
+		list

@@ -33,7 +33,7 @@ def test_minecraft_versionless_executable(host):
 def test_minecraft_eula(host):
     minecraft = host.file("/srv/minecraft/eula.txt")
     assert minecraft.exists
-    assert minecraft.content == "eula=true\n"
+    assert minecraft.content_string == "eula=true\n"
 
 
 def test_minecraft_service_running_and_enabled(host):

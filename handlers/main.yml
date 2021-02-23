@@ -6,6 +6,7 @@
 - name: reload systemd
   systemd:
     daemon_reload: yes
+  when: not minecraft_process_control == 'systemd'
   become: true
 
 - name: restart Minecraft
@@ -38,7 +39,7 @@
 
 - name: enable service (supervisor)
   supervisorctl:
-    path: "/etc/supervisor/conf.d/{{ minecraft_service_name }}.conf"
+    name: "{{ minecraft_service_name }}"
     state: restarted
   become: true
   when: minecraft_process_control == 'supervisor'

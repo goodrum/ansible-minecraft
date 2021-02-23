@@ -1,0 +1,10 @@
+---
+- name: Prepare
+  hosts: all
+  gather_facts: true
+  tasks:
+    # => 2019-06-30
+    # => This step should really be removed and included as part of the Role
+    - name: Update Cache
+      apt:
+        update_cache: yes
