@@ -1,0 +1,47 @@
+---
+- name: Install Forge server
+  shell: "java -jar forge-latest.jar --installServer"
+  args:
+    chdir: "{{ minecraft_home }}"
+    creates: "{{ minecraft_home }}/{{ forge_version }}.jar"
+  register: installer
+  become_user: "{{ minecraft_user }}"
+
+- name: Get Forge Instance Name
+  find:
+    path: "{{ minecraft_home }}"
+    patterns: "{{ forge_version }}.jar"
+  register: forge_exe
+
+- name: Update Ownership on Forge Instance
+  file:
+    path: "{{ item.path }}"
+    owner: "{{ minecraft_service_name }}"
+    group: "{{ minecraft_service_name }}"
+  with_items: "{{ forge_exe.files }}"
+
+- name: symlink Minecraft server
+  file:
+    src: "{{ item.path }}"
+    path: "{{ minecraft_home }}/forge.jar"
+    owner: "{{ minecraft_user }}"
+    group: "{{ minecraft_group }}"
+    state: link
+  with_items: "{{ forge_exe.files }}"
+  register: symlink_created
+
+- name: Update Ownership of Symlink
+  shell: "chown -h {{ minecraft_user }}:{{ minecraft_group}} {{ minecraft_home }}/forge.jar"
+  args:
+    warn: false
+  when: symlink_created.changed
+
+- name: agree to EULA
+  copy:
+    src: eula.txt
+    dest: "{{ minecraft_home }}/eula.txt"
+    mode: '0644'
+    owner: "{{ minecraft_user }}"
+    group: "{{ minecraft_group }}"
+  notify:
+    - enable service

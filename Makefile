@@ -3,6 +3,8 @@ BOXES := $(notdir $(wildcard docker/*))
 PROCESS_CONTROL ?= systemd
 SERVER          ?= minecraft
 DOCKER_DIRECTORY:= docker
+VERSION         ?= $(if $(version),$(version),)
+suite_version   := $(if $(VERSION),_$(VERSION),"")
 
 define USAGE
 targets:
@@ -62,8 +64,9 @@ help:
 	@echo $(info $(USAGE))
 
 test:
+	@(echo "Running Molecule Tests" )
 ifeq (true,$(call is_machine_target))
-	molecule test -s $(firstword $(MAKECMDGOALS))
+	@(molecule test -s $(firstword $(MAKECMDGOALS))$(suite_version))
 else
 	@(\
 	for test_suite in $(BOXES) ; do \

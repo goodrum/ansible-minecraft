@@ -9,9 +9,11 @@ galaxy_info:
           versions:
               - trusty
               - xenial
+              - bionic
         - name: Debian
           versions:
-              - jessie
+              - stretch
+              - buster
         - name: EL
           versions:
               - 7

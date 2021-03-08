@@ -1,0 +1,80 @@
+---
+- debug:
+    msg: "Install and Configure Mod Server"
+
+- name: Test and Validate Mandatory Attributes
+  assert:
+    that: "{{test_var}} is defined and {{test_var}}|length > 0 and {{test_var}} != None"
+    fail_msg: "{{ test_var }} be defined with a valid value "
+    success_msg: "Required variables ({{ test_var }}) is defined"
+  loop_control:
+    loop_var: test_var
+  with_items:
+    - mod_server
+    - mod_server.url
+    - mod_server.checksum
+    - mod_server.jar_name
+  run_once: true
+
+- name: Create Ansible Temporary Directory
+  file:
+    path: "{{ minecraft_tmp_directory }}"
+    state: directory
+    mode: 0755
+
+- name: install unzip
+  package:
+    name: unzip
+    state: present
+
+- name: Download Install and Configure Mod Server
+  get_url:
+    url: "{{ mod_server.url }}"
+    dest: "{{ minecraft_tmp_directory }}/{{mod_server.archive|default(mod_server.jar_name) }}"
+    checksum: "{{ mod_server.checksum }}"
+    owner: "{{ minecraft_service_name }}"
+    group: "{{ minecraft_service_name }}"
+    mode: 0755
+
+- name: Extract Mod Archive
+  unarchive:
+    src: "{{ minecraft_tmp_directory }}/{{mod_server.archive}}"
+    dest: "{{ minecraft_home }}"
+    owner: "{{ minecraft_service_name }}"
+    group: "{{ minecraft_service_name }}"
+  when: mod_server.is_archive is defined and mod_server.is_archive
+
+- name: Move Mod files to Mod Directory
+  copy:
+    src: "{{ minecraft_tmp_directory }}/{{ mod_server.jar_name }}"
+    dest: "{{ minecraft_home }}/{{ mod_server.jar_directory }}/"
+    remote_src: true
+    owner: "{{ minecraft_service_name }}"
+    group: "{{ minecraft_service_name }}"
+    mode: 0755
+  when: mod_server.jar_name is defined and mod_server.jar_name
+
+- name: Update Minecraft Server links if required
+  block:
+  - name: Unlink minecraft_server
+    file:
+      path: "{{ minecraft_home }}/minecraft_server.jar"
+      state: absent
+
+  - name: symlink Mod server
+    file:
+      src: "{{ minecraft_home }}/{{ mod_server.jar_name }}"
+      path: "{{ minecraft_home }}/{{ minecraft_jar }}"
+      owner: "{{ minecraft_user }}"
+      group: "{{ minecraft_group }}"
+      state: link
+  when: mod_server.is_standalone is defined and mod_server.is_standalone
+
+- name: Set Permissions
+  file:
+    path: "{{ minecraft_home }}"
+    owner: "{{ minecraft_service_name }}"
+    group: "{{ minecraft_service_name }}"
+    mode: 0755
+    recurse: true
+    state: directory

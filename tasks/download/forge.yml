@@ -1,0 +1,9 @@
+---
+- name: Download Forge
+  get_url:
+    url: "{{ minecraft_forge_url }}"
+    dest: "{{ minecraft_home }}/forge-latest.jar"
+    checksum: "{{ minecraft_forge_checksum }}"
+    owner: "{{ minecraft_service_name }}"
+    group: "{{ minecraft_service_name }}"
+    mode: 0755

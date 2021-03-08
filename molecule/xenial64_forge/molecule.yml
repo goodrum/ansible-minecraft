@@ -1,0 +1,43 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: docker
+platforms:
+  - name: minecraft_xenial64_python2_forge
+    image: minecraft_xenial64:python2
+    pull: false
+    privileged: True
+    command: /sbin/init
+    groups:
+      - forge
+    env:
+      MINECRAFT_SERVER: "forge"
+  - name: minecraft_xenial64_python3_forge
+    image: minecraft_xenial64:python3
+    pull: false
+    privileged: True
+    command: /sbin/init
+    groups:
+      - forge
+    env:
+      MINECRAFT_SERVER: "forge"
+provisioner:
+  name: ansible
+  inventory:
+    links:
+      group_vars: ../shared_inventory/group_vars/
+  config_options:
+    defaults:
+      verbosity: 0
+  playbooks:
+    prepare: ../shared_playbooks/prepare.yml
+    converge: ../shared_playbooks/converge_latest.yml
+    verify: ../shared_tests/verify.yml
+  lint:
+    name: ansible-lint
+verifier:
+  name: ansible
+  lint:
+    name: flake8
+
