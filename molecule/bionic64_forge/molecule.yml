@@ -4,19 +4,25 @@ dependency:
 driver:
   name: docker
 platforms:
-  - name: minecraft_bionic64_python2
+  - name: minecraft_bionic64_python2_forge
     image: minecraft_bionic64:python2
     pull: false
     privileged: True
     command: /lib/systemd/systemd
+    groups:
+      - forge
     env:
+      MINECRAFT_SERVER: "forge"
       MINECRAFT_PROCESS_CONTROL: "supervisor"
-  - name: minecraft_bionic64_python3
+  - name: minecraft_bionic64_python3_forge
     image: minecraft_bionic64:python3
     pull: false
     privileged: True
     command: /lib/systemd/systemd
+    groups:
+      - forge
     env:
+      MINECRAFT_SERVER: "forge"
       MINECRAFT_PROCESS_CONTROL: "supervisor"
 provisioner:
   name: ansible
@@ -36,3 +42,4 @@ verifier:
   name: ansible
   lint:
     name: flake8
+
