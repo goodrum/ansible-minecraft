@@ -34,6 +34,7 @@ provisioner:
     defaults:
       verbosity: 0
   playbooks:
+    prepare: ../shared_playbooks/prepare.yml
     converge: ../shared_playbooks/converge_latest.yml
     verify: ../shared_tests/verify.yml
   lint:
