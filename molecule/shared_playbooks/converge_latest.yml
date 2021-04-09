@@ -2,7 +2,7 @@
 - name: Converge
   hosts: all
   vars:
-    minecraft_process_control: "{{ lookup('env', 'MINECRAFT_PROCESS_CONTROL') | default('systemd', true) }}"
+    minecraft_process_control: "{{ ansible_env.MINECRAFT_PROCESS_CONTROL | default('systemd', true) }}"
   tasks:
     - name: Converge Role
       include_role:
