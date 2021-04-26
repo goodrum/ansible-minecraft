@@ -5,39 +5,39 @@
     state: directory
     mode: 0755
 
-- name: Retrieve Versions Manifest
+- name: Retrieve All Versions Manifest
   get_url:
     url: "{{ minecraft_version_manifest_url }}"
     dest: "{{ minecraft_tmp_directory }}/versions_manifest.json"
+  register: manifest_download
 
-- name: Load Versions Manifest
+- name: Configure Manifest Facts
   set_fact:
-    minecraft_versions: "{{ (lookup('file', {{ minecraft_tmp_directory }}/versions_manifest.json)).stdout | from_json).versions  }}"
+    minecraft_version_manifest: "{{ lookup('file', manifest_download.dest.stdout | from_json))  }}"
+    minecraft_version_info: "{{ lookup('file', manifest_download.dest.stdout | from_json))  }}"
 
 - name: find latest release version
   set_fact:
-    minecraft_version: "{{ (minecraft_versions.stdout | from_json).latest.release }}"
+    minecraft_version: "{{ minecraft_version_manifest.latest.release }}"
   when: minecraft_version == "latest"
-
-- name: use the configured minecraft version number
-  set_fact:
-    minecraft_version: "{{ minecraft_version }}"
-  when: minecraft_version != "latest"
 
 - name: extract version specific mainfest file
   set_fact:
-    minecraft_version_manifest_url: "{{ minecraft_versions | selectattr('id','match', (minecraft_version|string) ) | map(attribute='url')  | list | first }}"
+    minecraft_version_manifest_url: |
+      "{{ minecraft_version_manifest.versions | \
+              selectattr('id','match', (minecraft_version|string) ) | map(attribute='url')  | list | first }}"
 
-- name: Retrieve Versions Manifest
+- name: Retrieve Version Specific Manifest
   get_url:
     url: "{{ minecraft_version_manifest_url }}"
     dest: "{{ minecraft_tmp_directory }}/versions_manifest.json"
+  register: manifest_version_download
 
 - name: Load Versions Manifest
   set_fact:
-    minecraft_version_info: "{{ lookup('file', {{ minecraft_tmp_directory }}/versions_manifest.json) }}"
+    minecraft_version_manifest: "{{ lookup('file', manifest_version_download.dest.stdout | from_json))  }}"
 
 - name: "extract the download url from version manifest"
   set_fact:
-    minecraft_server_download_url: "{{ ( minecraft_version_info.stdout | from_json).downloads.server.url }}"
-    minecraft_server_download_checksum: "sha1:{{ (minecraft_version_info.stdout | from_json).downloads.server.sha1 }}"
+    minecraft_server_download_url: "{{ minecraft_version_manifest.downloads.server.url }}"
+    minecraft_server_download_checksum: "sha1:{{ minecraft_version_manifest.downloads.server.sha1 }}"

@@ -1,4 +1,19 @@
 ---
+- name: Set Override Variable for Minecraft Jar
+  block:
+    - name: Find Minecraft Jar Override
+      find:
+        path: "{{ minecraft_home }}"
+        use_regex: true
+        pattern: "^minecraft_server[0-9.]+.jar$"
+      register: find_minecraft_instances
+
+    - name: Configure Minecraft Jar Override
+      set_fact:
+        override_minecraft_jar: "{{ find_minecraft_instances.files[0].path | basename }}"
+
+  when: minecraft_server == 'forge' or minecraft_server == 'spigot'
+
 # The only way to generate a server.properties file is to start Minecraft.
 # We send the stop command to the stdin to stop the server right after it
 # starts.
@@ -9,7 +24,7 @@
 # => unable to get the args:stdin to properly pass in the call so I added this
 # => stop gap.
 - name: generate server.properties
-  shell: echo "stop" | java -jar {{ minecraft_jar }} nogui  # noqa 306
+  shell: echo "stop" | java -jar {{ override_minecraft_jar is defined | ternary(override_minecraft_jar, minecraft_jar) }} nogui  # noqa 306
   args:
     creates: server.properties
     chdir: "{{ minecraft_home }}"

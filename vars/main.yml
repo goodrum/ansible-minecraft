@@ -6,3 +6,4 @@ supported_ansible_os_families:
 supported_minecraft_servers:
   - minecraft
   - spigot
+  - forge

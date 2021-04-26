@@ -4,22 +4,31 @@ dependency:
 driver:
   name: docker
 platforms:
-  - name: minecraft_stretch64_python2
-    image: minecraft_stretch64:python2
+  - name: minecraft_buster64_python2_forge
+    image: minecraft_buster64:python2
     pull: false
     privileged: True
     command: /sbin/init
+    groups:
+      - forge
     env:
+      MINECRAFT_SERVER: "forge"
       MINECRAFT_PROCESS_CONTROL: "supervisor"
-  - name: minecraft_stretch64_python3
-    image: minecraft_stretch64:python3
+  - name: minecraft_buster64_python3_forge
+    image: minecraft_buster64:python3
     pull: false
     privileged: True
     command: /sbin/init
+    groups:
+      - forge
     env:
+      MINECRAFT_SERVER: "forge"
       MINECRAFT_PROCESS_CONTROL: "supervisor"
 provisioner:
   name: ansible
+  inventory:
+    links:
+      group_vars: ../shared_inventory/group_vars/
   config_options:
     defaults:
       verbosity: 0

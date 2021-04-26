@@ -53,3 +53,15 @@
     - "{{ minecraft_service_name }}.service"
     - "{{ minecraft_service_name }}.socket"
   when: minecraft_process_control == 'systemd'
+
+# Since this is a symlink, we need to directly chown
+# to allow setting the permissions on the link
+# Ignore Lint Checks:  305
+- name: Update Ownership of Symlink
+  shell: "chown -h {{ minecraft_user }}:{{ minecraft_group }} {{ minecraft_home }}/$MINECRAFT_SERVER_JAR"
+  # noqa 305
+  args:
+    warn: false
+  environment:
+    MINECRAFT_SERVER_JAR: "{{ (minecraft_server == \"forge\")|ternary(\"forge.jar\", \"minecraft_server.jar\") }}"
+  changed_when: false

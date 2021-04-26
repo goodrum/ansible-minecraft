@@ -4,3 +4,6 @@
 
 - include_tasks: spigot.yml
   when: minecraft_server == 'spigot'
+
+- include_tasks: forge.yml
+  when: minecraft_server == 'forge'

@@ -3,17 +3,18 @@
 
 - name: Verify
   hosts: all
-  gather_facts: false
+  gather_facts: true
   vars:
-    minecraft_user: "{{ lookup('env', 'MINECRAFT_USER')|default('minecraft', true) }}"
-    minecraft_group: "{{ lookup('env', 'MINECRAFT_GROUP')|default('minecraft', true) }}"
-    minecraft_dir: "{{ lookup('env', 'MINECRAFT_DIR') | default('/srv/minecraft', true) }}"
-    minecraft_service_name: "{{ lookup('env', 'MINECRAFT_SERVICE_NAME') | default(minecraft_user, true) }}"
+    minecraft_server: "{{ ansible_env.MINECRAFT_SERVER |default('minecraft_server', true) }}"
+    minecraft_user: "{{ ansible_env.MINECRAFT_USER |default('minecraft', true) }}"
+    minecraft_group: "{{ ansible_env.MINECRAFT_GROUP |default('minecraft', true) }}"
+    minecraft_dir: "{{ ansible_env.MINECRAFT_DIR | default('/srv/minecraft', true) }}"
+    minecraft_service_name: "{{ ansible_env.MINECRAFT_SERVICE_NAME | default(minecraft_user, true) }}"
     minecraft_socket_name_default: "{{minecraft_service_name}}.socket"
-    minecraft_socket_name: "{{ lookup('env', 'MINECRAFT_SOCKET_NAME') | default(minecraft_socket_name_default, true) }}"
-    minecraft_process_control: "{{ lookup('env', 'MINECRAFT_PROCESS_CONTROL') | default('systemd', true) }}"
-    minecraft_service_port: "{{ lookup('env', 'MINECRAFT_SERVICE_PORT') | default('25565', true) }}"
-    minecraft_socket_port: "{{ lookup('env', 'MINECRAFT_SOCKET_PORT') | default('25564', true) }}"
+    minecraft_socket_name: "{{ ansible_env.MINECRAFT_SOCKET_NAME | default(minecraft_socket_name_default, true) }}"
+    minecraft_process_control: "{{ ansible_env.MINECRAFT_PROCESS_CONTROL | default('systemd', true) }}"
+    minecraft_service_port: "{{ ansible_env.MINECRAFT_SERVICE_PORT | default('25565', true) }}"
+    minecraft_socket_port: "{{ ansible_env.MINECRAFT_SOCKET_PORT | default('25564', true) }}"
   tasks:
     - name: Load local users and groups
       getent:
@@ -45,7 +46,7 @@
 
     - name: Find Minecraft versionless executable
       stat:
-        path: "{{ minecraft_dir }}/minecraft_server.jar"
+        path: "{{ minecraft_dir }}/{{ minecraft_server }}.jar"
       register: minecraft_installation_exe
 
     - name: Find Minecraft EULA
@@ -74,7 +75,6 @@
           - minecraft_installation.stat.gid == (getent_group[minecraft_group][1]|int)
           # UID from getent_group is always element 1
           - minecraft_installation.stat.uid == (getent_passwd[minecraft_user][1]|int)
-
 
     - name: Verify Minecraft versionless executable
       assert:

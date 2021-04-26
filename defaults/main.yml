@@ -2,7 +2,7 @@
 minecraft_server: minecraft
 minecraft_version: latest
 minecraft_url: https://launcher.mojang.com/v1/objects
-minecraft_service_name: "{{ minecraft_server }}"
+minecraft_service_name: minecraft
 minecraft_user: "{{ minecraft_service_name }}"
 minecraft_group: "{{ minecraft_service_name }}"
 minecraft_home: /srv/{{ minecraft_service_name }}
@@ -23,3 +23,9 @@ minecraft_server_properties:
 minecraft_spigot_url: https://hub.spigotmc.org/jenkins/job/BuildTools/lastSuccessfulBuild/artifact/target/BuildTools.jar
 
 minecraft_tmp_directory: /tmp/ansible-minecraft
+
+minecraft_forge_url: "https://files.minecraftforge.net/maven/net/minecraftforge/forge/1.12.2-14.23.5.2854/forge-1.12.2-14.23.5.2854-installer.jar"
+minecraft_forge_checksum: "sha256:d86b5a6dfbe9768a3c3363ba3dd0aafc1fc28f9057ca83e8820dda3d7caadaff"
+forge_version: forge-1.12.2-14.23.5.2854
+
+include_mods: false

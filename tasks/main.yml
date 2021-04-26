@@ -45,6 +45,10 @@
 - name: Minecraft before start hook
   include_tasks: "{{ minecraft_hook_before_start | default('empty.yml') }}"
 
+- name: Install Mod Packs
+  include_tasks: install-mods.yml
+  when: include_mods
+
 - meta: flush_handlers
 
 - name: Minecraft after start hook

@@ -9,11 +9,15 @@ platforms:
     pull: false
     privileged: True
     command: /sbin/init
+    env:
+      MINECRAFT_PROCESS_CONTROL: "supervisor"
   - name: minecraft_buster64_python3
     image: minecraft_buster64:python3
     pull: false
     privileged: True
     command: /sbin/init
+    env:
+      MINECRAFT_PROCESS_CONTROL: "supervisor"
 provisioner:
   name: ansible
   config_options:

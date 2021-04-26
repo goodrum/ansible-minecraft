@@ -26,18 +26,21 @@
     state: present
     install_recommends: no
 
-- name: install java8 on trusty
-  apt:
-    name: openjdk-8-jdk
-    state: present
-    install_recommends: no
-  when: ansible_distribution_release == 'trusty'
+# 2021-03-15
+# At this time, Forge will not load with any JDK version above 1.8
+- name: Install Alternate JDK
+  block:
+    - name: Install Java JDK8
+      apt:
+        name: openjdk-8-jdk
+        state: present
+        install_recommends: no
 
-- name: correct java version on trusty
-  alternatives:
-    name: java
-    path: /usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java
-  when: ansible_distribution_release == 'trusty'
+    - name: correct java version on trusty
+      alternatives:
+        name: java
+        path: /usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java
+  when: ansible_distribution_release == 'trusty' or minecraft_server == 'forge'
 
 - name: install Spigot dependencies
   apt:
