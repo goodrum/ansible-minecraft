@@ -28,7 +28,6 @@ provisioner:
     links:
       group_vars: ../shared_inventory/group_vars/
   config_options:
-  config_options:
     defaults:
       verbosity: 0
   playbooks:

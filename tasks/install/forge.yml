@@ -1,7 +1,8 @@
 ---
-- name: Install Forge server
-  shell: "java -jar forge-latest.jar --installServer"
+- name: Install Forge server # noqa 204
+  shell: "java -jar forge-latest.jar --installServer" # noqa 305
   args:
+    warn: false
     chdir: "{{ minecraft_home }}"
     creates: "{{ minecraft_home }}/{{ forge_version }}.jar"
   register: installer
@@ -28,13 +29,8 @@
     group: "{{ minecraft_group }}"
     state: link
   with_items: "{{ forge_exe.files }}"
-  register: symlink_created
-
-- name: Update Ownership of Symlink
-  shell: "chown -h {{ minecraft_user }}:{{ minecraft_group}} {{ minecraft_home }}/forge.jar"
-  args:
-    warn: false
-  when: symlink_created.changed
+  notify:
+    - Update Ownership of Symlink
 
 - name: agree to EULA
   copy:

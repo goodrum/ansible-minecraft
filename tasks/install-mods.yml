@@ -4,7 +4,7 @@
 
 - name: Test and Validate Mandatory Attributes
   assert:
-    that: "{{test_var}} is defined and {{test_var}}|length > 0 and {{test_var}} != None"
+    that: "{{ test_var }} is defined and {{ test_var }}|length > 0 and {{ test_var }} != None"
     fail_msg: "{{ test_var }} be defined with a valid value "
     success_msg: "Required variables ({{ test_var }}) is defined"
   loop_control:
@@ -30,7 +30,7 @@
 - name: Download Install and Configure Mod Server
   get_url:
     url: "{{ mod_server.url }}"
-    dest: "{{ minecraft_tmp_directory }}/{{mod_server.archive|default(mod_server.jar_name) }}"
+    dest: "{{ minecraft_tmp_directory }}/{{ mod_server.archive|default(mod_server.jar_name) }}"
     checksum: "{{ mod_server.checksum }}"
     owner: "{{ minecraft_service_name }}"
     group: "{{ minecraft_service_name }}"
@@ -38,7 +38,7 @@
 
 - name: Extract Mod Archive
   unarchive:
-    src: "{{ minecraft_tmp_directory }}/{{mod_server.archive}}"
+    src: "{{ minecraft_tmp_directory }}/{{ mod_server.archive }}"
     dest: "{{ minecraft_home }}"
     owner: "{{ minecraft_service_name }}"
     group: "{{ minecraft_service_name }}"
